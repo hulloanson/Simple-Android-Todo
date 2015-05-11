@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<items version="2" >
+
+    <item
+        jar="/Users/ycl/AndroidStudioProjects/Todo/app/build/intermediates/exploded-aar/com.android.support/appcompat-v7/22.1.1/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="a3ff3c506644c820eb2bdf06e8339f72be578551">
+        <dex dex="/Users/ycl/AndroidStudioProjects/Todo/app/build/intermediates/pre-dexed/debug/classes-965ca4eba74afcae0ec382fb4624df34ae104a03.jar" />
+    </item>
+    <item
+        jar="/Users/ycl/Library/Android/sdk/extras/android/m2repository/com/android/support/support-annotations/22.1.1/support-annotations-22.1.1.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="01d051a6bfb1218b1db2d3a5af0480ac2c25c42a">
+        <dex dex="/Users/ycl/AndroidStudioProjects/Todo/app/build/intermediates/pre-dexed/debug/support-annotations-22.1.1-1994313e5d2e9544a34227d629362925dd8b1ddc.jar" />
+    </item>
+    <item
+        jar="/Users/ycl/AndroidStudioProjects/Todo/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.1.1/jars/classes.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="c95ba8152923e4872e86a82cfcba9a51c0214328">
+        <dex dex="/Users/ycl/AndroidStudioProjects/Todo/app/build/intermediates/pre-dexed/debug/classes-962d768b3fa40cd51a5a6b38804ba4d2172a776f.jar" />
+    </item>
+    <item
+        jar="/Users/ycl/AndroidStudioProjects/Todo/app/build/intermediates/exploded-aar/com.android.support/support-v4/22.1.1/jars/libs/internal_impl-22.1.1.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="9e070ad32b2700b0343e8e0cccc437733d91ba3a">
+        <dex dex="/Users/ycl/AndroidStudioProjects/Todo/app/build/intermediates/pre-dexed/debug/internal_impl-22.1.1-ce1d619c8c76fb2ac7c13877733d37b25f7ce22f.jar" />
+    </item>
+    <item
+        jar="/Users/ycl/AndroidStudioProjects/Todo/app/libs/commons-io-2.4.jar"
+        jumboMode="false"
+        revision="22.0.1"
+        sha1="b1b6ea3b7e4aa4f492509a4952029cd8e48019ad">
+        <dex dex="/Users/ycl/AndroidStudioProjects/Todo/app/build/intermediates/pre-dexed/debug/commons-io-2.4-72d519004f119c330c2b071cfef7b0ebebd69dbd.jar" />
+    </item>
+
+</items>
