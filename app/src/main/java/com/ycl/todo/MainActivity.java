@@ -1,6 +1,11 @@
 package com.ycl.todo;
 
+import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.provider.BaseColumns;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -18,21 +23,28 @@ import java.util.ArrayList;
 
 
 public class MainActivity extends AppCompatActivity{
-    private ArrayList<String> tasks;
+    private ArrayList<Long> tasksId;
+    private ArrayList<String> tasksString;
     private ArrayAdapter<String> tasksAdapter;
     private ListView lvTasks;
+    private dbHelper myDb;
+    public SQLiteDatabase openedDb;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        readItems();
         lvTasks = (ListView) findViewById(R.id.lvTasks);
-        tasks = new ArrayList<String>();
+        tasksId  = new ArrayList<Long>();
+        tasksString = new ArrayList<String>();
+        myDb = new dbHelper(this);
+        SQLiteDatabase openedDb = myDb.getWritableDatabase();
+        loadAll(openedDb);
         tasksAdapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_list_item_1, tasks);
+                android.R.layout.simple_list_item_1, tasksString);
         lvTasks.setAdapter(tasksAdapter);
         setupListViewListener();
     }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -63,11 +75,11 @@ public class MainActivity extends AppCompatActivity{
                     public boolean onItemLongClick(AdapterView<?> adapter,
                                                    View item, int pos, long id) {
                         // Remove the item within array at position
-                        tasks.remove(pos);
+                        tasksString.remove(pos);
                         // Refresh the adapter
                         tasksAdapter.notifyDataSetChanged();
                         // Return true consumes the long click event (marks it handled)
-                        writeItems();
+                        removeItem(openedDb, tasksId.get(pos));
                         return true;
                     }
 
@@ -75,17 +87,18 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void onAddItem(View v) {
+        String trimmed = "";
         EditText typeTask = (EditText) findViewById(R.id.typeTask);
         String itemText = typeTask.getText().toString();
         int[] checkNoneReturn = checkNone(itemText);
         if (checkNoneReturn[0] == 0){
-            String trimmed = itemText.substring(checkNoneReturn[1]);
-            tasks.add(trimmed);
+            trimmed = itemText.substring(checkNoneReturn[1]);
+            tasksString.add(trimmed);
         }else{
             spawnToast("Please enter something!", true);
         }
         typeTask.setText("");
-        writeItems();
+        writeItem(openedDb, trimmed);
     }
 
     public int[] checkNone(String s){
@@ -135,23 +148,61 @@ public class MainActivity extends AppCompatActivity{
 //        }
 //    }
 
-    private void readItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            tasks = new ArrayList<String>(FileUtils.readLines(todoFile));
-        } catch (IOException e) {
-            tasks = new ArrayList<String>();
+    public static abstract class DbEntry implements BaseColumns {
+        public static final String tableName = "tasks";
+        public static final String taskId = "id";
+        public static final String taskName = "title";
+//            public static final String taskDue = "due";
+//            public static final String taskDescription = "description";
+    }
+
+    public class dbHelper extends SQLiteOpenHelper{
+        public static final int DATABASE_VERSION = 1;
+        public static final String DATABASE_NAME = "tasksList.db";
+        private final String SQL_CREATE_ENTRIES = "CREATE TABLE " + DbEntry.tableName + "(" + DbEntry._ID + " INTEGER PRIMARY KEY," + DbEntry.taskName + " TEXT" + " )";
+        private static final String SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS " + DbEntry.tableName;
+
+        public dbHelper(Context context) {
+            super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        }
+        public void onCreate(SQLiteDatabase db) {
+            db.execSQL(SQL_CREATE_ENTRIES);
+        }
+        public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            // This database is only a cache for online data, so its upgrade policy is
+            // to simply to discard the data and start over
+            db.execSQL(SQL_DELETE_ENTRIES);
+            onCreate(db);
+        }
+
+        public void onDowngrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+            onUpgrade(db, oldVersion, newVersion);
         }
     }
 
-    private void writeItems() {
-        File filesDir = getFilesDir();
-        File todoFile = new File(filesDir, "todo.txt");
-        try {
-            FileUtils.writeLines(todoFile, tasks);
-        } catch (IOException e) {
-            e.printStackTrace();
+    private void loadAll(SQLiteDatabase db){
+        final String[] columns = {DbEntry._ID, DbEntry.taskName};
+        Cursor result = db.query(DbEntry.tableName, columns, null, null, null, null, null);
+        result.moveToFirst();
+        tasksId.add(result.getLong(result.getColumnIndexOrThrow(DbEntry._ID)));
+        tasksString.add(result.getString(result.getColumnIndexOrThrow(DbEntry.taskName)));
+        while(!(result.isAfterLast())){
+            result.moveToNext();
+            tasksId.add(result.getLong(result.getColumnIndexOrThrow(DbEntry._ID)));
+            tasksString.add(result.getString(result.getColumnIndexOrThrow(DbEntry.taskName)));
         }
+    }
+
+    private void writeItem(SQLiteDatabase db, String taskString){
+        ContentValues insertValues = new ContentValues();
+        insertValues.put(DbEntry.taskName, taskString);
+        long newId = db.insert(DbEntry.tableName, null, insertValues);
+        tasksId.add(newId);
+    }
+
+    private void removeItem(SQLiteDatabase db, long taskId){
+        String columnSelection = DbEntry.taskId;
+        String[] valueSelection = {String.valueOf(taskId)};
+        db.delete(DbEntry.tableName, columnSelection, valueSelection);
     }
 }
